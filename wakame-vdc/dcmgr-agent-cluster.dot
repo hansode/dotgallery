@@ -1,0 +1,24 @@
+digraph G {
+// http://graphviz.org/Gallery/twopi/twopi2.gv.txt
+// ranksep=3;
+// ratio=auto;
+// size="8,5"
+  size="5,4"
+
+  bksta;
+  collector;
+  hva;
+  natbox;
+  nsa;
+  nwmongw;
+  sta;
+  amqp;
+
+  bksta     -> amqp;
+  collector -> amqp;
+  hva       -> amqp;
+  natbox    -> amqp;
+  nwmongw   -> amqp;
+  nsa       -> amqp;
+  sta       -> amqp;
+}

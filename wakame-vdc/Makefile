@@ -1,5 +1,8 @@
 all:
 
+dcmgr-agent-cluster:
+	dot -Tpng -o $@.png $@.dot
+
 dcmgr-er.core:
 	dot -Tpng -o $@.png $@.dot
 
