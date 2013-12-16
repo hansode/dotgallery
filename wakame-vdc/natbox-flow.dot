@@ -1,0 +1,56 @@
+digraph G {
+//rankdir=LR;
+
+  subgraph cluster_collector {
+    label = "collector"
+
+    subgraph cluster_natbox_collector {
+      label = "natbox_collector"
+      get_alive_network_routes;
+    }
+  }
+
+  subgraph cluster_channel {
+    label = "event.channel"
+
+    "vnet/network_route/created";
+    "vnet/network_route/deleted";
+  }
+
+  subgraph cluster_endpoint {
+    label = "endpoint"
+
+    subgraph cluster_network_vif {
+      label = "network_vif"
+
+      "post   '/:vif_id/external_ip'" -> "vnet/network_route/created" [label = "publish"];
+      "delete '/:vif_id/external_ip'" -> "vnet/network_route/deleted" [label = "publish"];
+    }
+  }
+
+  subgraph cluster_natbox_vm {
+    label = "Natbox VM"
+
+    subgraph cluster_openvswitch {
+      label = "Open vSwitch"
+
+      ovs_vsctl;
+      ovs [label = "Open vSwitch"];
+      ovs_vsctl -> ovs;
+    }
+
+    subgraph cluster_natbox {
+      label = "natbox"
+
+      "vnet/network_route/created" -> network_route_created [label = "subscribe"];
+      "vnet/network_route/deleted" -> network_route_deleted [label = "subscribe"];
+
+      network_route_created -> get_network_route;
+      network_route_deleted -> get_network_route;
+      get_network_route -> get_alive_network_routes;
+
+      network_route_created -> add_nat    -> add_flows_from_list -> ovs_vsctl;
+      network_route_deleted -> remove_nat -> del_flows_from_list -> ovs_vsctl;
+    }
+  }
+}
