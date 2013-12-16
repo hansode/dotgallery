@@ -1,0 +1,25 @@
+digraph isono_node_state {
+// https://github.com/axsh/isono/blob/598e6744da6834946eff0362bcf1cfdd412a3b73/lib/isono/models/node_state.rb#L23-L45
+  size="8,5"
+
+  node [shape = doublecircle]
+  state_0       [label = " "]
+  state_offline [label = "offline"]
+
+  node [shape = circle]
+  state_init    [label = "init"]
+  state_online  [label = "online"]
+  state_timeout [label = "timeout"]
+
+  state_0 -> state_init [label = "notify"];
+
+  state_online  -> state_online [label = "on_ping"];
+  state_init    -> state_online [label = "on_ping"];
+  state_timeout -> state_online [label = "on_ping"];
+
+  state_online  -> state_offline [label = "on_unmonitor"];
+  state_timeout -> state_offline [label = "on_unmonitor"];
+
+  state_online  -> state_timeout [label = "on_timeout"];
+  state_timeout -> state_timeout [label = "on_timeout"];
+}
