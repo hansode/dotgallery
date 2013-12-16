@@ -1,0 +1,186 @@
+digraph G {
+ //style=bold;
+ //rankdir=LR;
+  ranksep="1.5";
+
+  account;
+  account_resource;
+  accounting_log;
+  alarm;
+  backup_object;
+  backup_storage;
+  dc_network;
+  dhcp_range;
+  frontend_system;
+  history;
+  host_node;
+  host_node_vnet;
+  hostname_lease;
+  image;
+  instance;
+  instance_monitor_attr;
+  ip_handle;
+  ip_lease;
+  ip_pool;
+  ip_pool_dc_network;
+  iscsi_storage_node;
+  iscsi_volume;
+  load_balancer;
+  load_balancer_inbound;
+  load_balancer_target;
+  local_volume;
+  mac_lease;
+  mac_range;
+  network;
+  network_route;
+  network_service;
+  network_vif;
+  network_vif_ip_lease;
+  network_vif_monitor;
+  network_vif_security_group;
+  queued_job;
+  request_log;
+  resource_label;
+  security_group;
+  security_group_reference;
+  ssh_key_pair;
+  storage_node;
+  tag;
+  tag_mapping;
+  vlan_lease;
+  volume;
+  volume_snapshot;
+
+  # *-> dc_network
+
+  dc_network -> network    [label = "one_to_many"]; // ok
+  dc_network -> vlan_lease [label = "one_to_many"]; // ok
+  dc_network -> vlan_lease [label = "one_to_one"];  // ok
+
+  network -> network_vif          [label = "one_to_many"]; // ok
+  network -> network_vif_ip_lease [label = "one_to_many"]; // ok
+  network -> network_route        [label = "one_to_many"]; // ok
+  network -> dhcp_range           [label = "one_to_many"]; // ok
+  network -> dc_network           [label = "many_to_one"]; // ok
+
+  network_vif -> network                    [label = "many_to_one"];  // ok
+  network_vif -> network_vif_security_group [label = "many_to_many"]; // ok
+  network_vif -> network                    [label = "many_to_one"];  // ok
+  network_vif -> ip_lease                   [label = "one_to_many"];  // ok
+  network_vif -> network_vif_ip_lease       [label = "one_to_many"];  // ok
+  network_vif -> network_route              [label = "one_to_many"];  // ok
+  network_vif -> instance                   [label = "many_to_one"];  // ok
+  network_vif -> network_service            [label = "one_to_many"];  // ok
+  network_vif -> network_vif_monitor        [label = "one_to_many"];  // ok
+
+  network_vif -> mac_lease                  [label = "one_to_one"];  // ok
+
+  network_vif_ip_lease -> network     [label = "many_to_one"]; // ok
+  network_vif_ip_lease -> network_vif [label = "many_to_one"]; // ok
+  network_vif_ip_lease -> ip_handle   [label = "many_to_one"]; // ok
+
+  network_vif_ip_lease -> ip_lease [label = "<before_save/before_destroy>"]; // ok
+
+  network_route -> network_vif_ip_lease [label = "many_to_one"]; // ok
+
+  dhcp_range -> network [label = "many_to_one"];  // ok
+
+  ip_handle -> network_vif_ip_lease [label = "one_to_one"];  // ok
+  ip_handle -> ip_pool              [label = "many_to_one"]; // ok
+
+  ip_pool -> ip_pool_dc_network [label = "many_to_many"]; // ok
+  ip_pool -> ip_handle          [label = "one_to_many"];  // ok
+
+  vlan_lease -> dc_network [label = "many_to_one"]; // ok
+
+  ip_pool_dc_network -> ip_pool    [label = "many_to_one"]; // ok
+  ip_pool_dc_network -> dc_network [label = "many_to_one"]; // ok
+
+  ip_lease -> network [label = "many_to_one"]; // ok
+
+  instance -> image                 [label = "many_to_one"]; // ok
+  instance -> host_node             [label = "many_to_one"]; // ok
+  instance -> volume                [label = "one_to_many"]; // ok
+  instance -> network_vif           [label = "one_to_many"]; // ok
+  instance -> ssh_key_pair          [label = "many_to_one"]; // ok
+  instance -> instance_monitor_attr [label = "one_to_one"];  // ok
+
+  instance -> hostname_lease [label = "<before_save/before_destroy>"];
+
+  network_service -> network_vif [label = "many_to_one"]; // ok
+
+  network_vif_monitor -> network_vif [label = "many_to_one"]; // ok
+
+  image -> backup_object [label = "many_to_one"]; // ok
+  image -> instance      [label = "<before_destroy>"]; // ok
+
+  host_node -> instance       [label = "one_to_many"]; // ok
+  host_node -> isono_node     [label = "many_to_one"]; // OK!!!
+  host_node -> host_node_vnet [label = "one_to_many"]; // ok
+  host_node -> local_volume   [label = "one_to_many"]; // ok
+
+  volume -> instance [label = "many_to_one"]; // ok
+  volume -> backup_object [label = "many_to_one"]; // ok
+  volume -> backup_object [label = "one_to_many"]; // ok
+
+  ssh_key_pair          -> instance [label = "one_to_many"]; // ok
+  instance_monitor_attr -> instance [label = "many_to_one"]; // ok
+
+  host_node_vnet -> host_node [label = "many_to_one"]; // ok
+  host_node_vnet -> network   [label = "many_to_one"]; // ok
+  host_node_vnet -> mac_lease [label = "<before_destroy>"];
+
+  local_volume -> instance [label = "many_to_one"]; // ok
+  local_volume -> volume   [label = "one_to_one"];  // ok
+
+  network_vif_security_group -> network_vif     [label = "many_to_one"]; // ok
+  network_vif_security_group -> security_group  [label = "many_to_one"]; // ok
+
+  security_group -> network_vif_security_group [label = "many_to_many"]; // ok
+  security_group -> security_group_reference   [label = "many_to_many"]; // ok
+
+  security_group_reference -> security_group [label = "many_to_one"]; // ok
+  security_group_reference -> security_group [label = "many_to_one"]; // ok
+
+  network_vif_security_group -> network_vif    [label = "many_to_one"]; // ok
+  network_vif_security_group -> security_group [label = "many_to_one"]; // ok
+
+  backup_object -> backup_storage [label = "many_to_one"]; // ok
+
+  backup_storage -> backup_object [label = "one_to_many"]; // ok
+  backup_storage -> isono_node    [label = "many_to_one"]; // OK!!!
+
+  iscsi_storage_node -> storage_node [label = "<extends>"];
+  iscsi_storage_node -> iscsi_volume [label = "one_to_many"]; // ok
+  iscsi_volume -> iscsi_storage_node [label = "many_to_one"]; // ok
+
+  load_balancer -> instance              [label = "many_to_one"]; // ok
+  load_balancer -> load_balancer_target  [label = "one_to_many"]; // ok
+  load_balancer -> load_balancer_inbound [label = "one_to_many"]; // ok
+
+  load_balancer_target  -> load_balancer [label = "many_to_one"]; // ok
+  load_balancer_target  -> network_vif   [label = "<filter>"]; // ok
+  load_balancer_inbound -> load_balancer [label = "many_to_one"]; // ok
+
+  queued_job -> queued_job [label = "many_to_one"]; // ok
+  queued_job -> queued_job [label = "one_to_many"]; // ok
+
+  storage_node -> isono_node    [label = "many_to_one"]; // OK!!!
+
+  account -> tag [label = "one_to_many"]; // ok
+  tag -> account     [label = "many_to_one"]; // ok
+  tag -> tag_mapping [label = "one_to_many"]; // ok
+  tag_mapping -> tag [label = "many_to_one"]; // ok
+
+  volume_snapshot -> storage_node [label = "many_to_one"]; // ok
+
+  mac_range -> mac_lease [label = "one_to_many"]; // ok: used from scheduler/mac_address
+
+  backup_object  -> resource_label;
+  image          -> resource_label;
+  instance       -> resource_label;
+  load_balancer  -> resource_label;
+  security_group -> resource_label;
+  ssh_key_pair   -> resource_label;
+  volume         -> resource_label;
+}
